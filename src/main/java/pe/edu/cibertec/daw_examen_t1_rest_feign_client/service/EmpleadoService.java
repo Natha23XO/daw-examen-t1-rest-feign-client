@@ -1,41 +1,42 @@
 package pe.edu.cibertec.daw_examen_t1_rest_feign_client.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pe.edu.cibertec.daw_examen_t1_rest_feign_client.model.Empleado;
 import pe.edu.cibertec.daw_examen_t1_rest_feign_client.repository.EmpleadoRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
-public class EmpleadoService implements EmpleadoRepository {
+public class EmpleadoService{
 
-    @Override
-    public List<Empleado> obtenerEmpleados() {
-        List<Empleado> empleados = new ArrayList<>();
+    private final EmpleadoRepository empleadoRepository;
 
-        Empleado empleado1 = new Empleado();
-        empleado1.setId(1);
-        empleado1.setNombre("Hugo Nathanael");
-        empleado1.setApellido("Castro Leon");
-        empleado1.setPuesto("Desarrollador Web");
+    public List<Empleado> findAll() {
+        return this.empleadoRepository.findAll();
+    }
 
-        Empleado empleado2 = new Empleado();
-        empleado2.setId(2);
-        empleado2.setNombre("Genesis Giovanna");
-        empleado2.setApellido("Despoux Arica");
-        empleado2.setPuesto("Analista de Datos");
+    public Empleado findById(Long id) {
+        return this.empleadoRepository.findById(id).orElseThrow(() -> new RuntimeException("Empleado con id " + id + " no existe."));
+    }
 
-        Empleado empleado3 = new Empleado();
-        empleado3.setId(3);
-        empleado3.setNombre("Patrick Alexander");
-        empleado3.setApellido("Montes de Oca");
-        empleado3.setPuesto("Ingeniero de Datos");
+    public Empleado create(Empleado empleado) {
+        return this.empleadoRepository.save(empleado);
+    }
 
-        empleados.add(empleado1);
-        empleados.add(empleado2);
-        empleados.add(empleado3);
+    public Empleado update(Empleado empleado, Long id) {
+        Empleado empleadoAux = this.empleadoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Empleado con id " + id + " no existe."));
+        empleadoAux.setNombre(empleado.getNombre());
+        empleadoAux.setApellido(empleado.getApellido());
+        empleadoAux.setPuesto(empleado.getPuesto());
+        return this.empleadoRepository.save(empleadoAux);
+    }
 
-        return empleados;
+    public String delete(Long id) {
+        Empleado cliente = this.findById(id);
+        this.empleadoRepository.delete(cliente);
+        return "Empleado con id " + id + " eliminado.";
     }
 }
